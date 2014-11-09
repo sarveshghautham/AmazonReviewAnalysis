@@ -1,0 +1,21 @@
+product/productId: B000FTPOMK
+product/title: 14k Yellow Gold Butterfly Pendant, 16"
+product/price: unknown
+review/userId: A3T4KKUM1JATUX
+review/profileName: Disappointed Sony customer
+review/helpfulness: 1/1
+review/score: 4.0
+review/time: 1178150400
+review/summary: pretty necklace
+review/text: It is a nice made necklace, and the butterfly pendant looks beautiful. I love it.
+
+product/productId: B000FTPOMK
+product/title: 14k Yellow Gold Butterfly Pendant, 16"
+product/price: unknown
+review/userId: A33LVMKCG9IG15
+review/profileName: A. Thorpe "Amazon lover"
+review/helpfulness: 1/1
+review/score: 4.0
+review/time: 1175990400
+review/summary: pretty necklace
+review/text: I bought this necklace on a whim; I love butterflies and it looked so dainty and sweet. It was actually a little more weighty than I expected, although it's not a solid piece. The chain is shiny and nicer than I expected.
