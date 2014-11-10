@@ -9,18 +9,27 @@ import com.datastax.driver.core.Session;
 
 public class Cassandra {
 	private Cluster cluster;
+	private static Cassandra dbObj = null;
 	
-	public Cassandra () {
-		connect("172.16.154.131");
+	private Cassandra () {
+		
 	}
-	
+	public static Cassandra getInstance() {
+		if(dbObj == null){	
+			dbObj = new Cassandra();
+		}
+		dbObj.connect("127.0.0.1");
+		
+		return dbObj;
+	}
 	protected void finalize() {
 		close();
 	}
 	
 	public void connect(String node) {
 	   cluster = Cluster.builder()
-	         .addContactPoint(node).withPort(9160).build();
+	         .addContactPoint(node).build();
+	   
 	   Metadata metadata = cluster.getMetadata();
 	   System.out.printf("Connected to cluster: %s\n", 
 	         metadata.getClusterName());
@@ -72,7 +81,7 @@ public class Cassandra {
 //				+ "WHERE product_id='"+product_id+"'";
 //
 //		casObj.insertData(query_try);
-//		
+		
 //	}
 	
 }

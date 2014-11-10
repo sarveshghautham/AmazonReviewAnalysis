@@ -15,12 +15,14 @@ public class ProductIdToName {
 	public static class Map extends
 			Mapper<LongWritable, Text, NullWritable, NullWritable> {
 
-		private Cassandra casObj = new Cassandra();
 		private String product_id = "";
+		private Cassandra casObj = Cassandra.getInstance();
 		
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
+			
+			
 			String line = value.toString();
 			String []tokens = line.split(" ");
 			
@@ -74,7 +76,7 @@ public class ProductIdToName {
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
 
-		Job job = new Job(conf, "wordcount");
+		Job job = new Job(conf, "ReviewAnalysis");
 		job.setJarByClass(WordCount.class);
 
 		job.setOutputKeyClass(Text.class);
