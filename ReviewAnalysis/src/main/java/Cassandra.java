@@ -6,6 +6,7 @@ import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 
 public class Cassandra {
 	private Cluster cluster;
@@ -28,7 +29,9 @@ public class Cassandra {
 	
 	public void connect(String node) {
 	   cluster = Cluster.builder()
-	         .addContactPoint(node).build();
+	         .addContactPoint(node).withPort(9042).
+	         build();
+	   
 	   
 	   Metadata metadata = cluster.getMetadata();
 	   System.out.printf("Connected to cluster: %s\n", 

@@ -1,49 +1,72 @@
 import java.io.IOException;
 
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapred.lib.NullOutputFormat;
+
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
 
 public class ProductIdToName {
 
 	public static class Map extends
-			Mapper<LongWritable, Text, NullWritable, NullWritable> {
+			Mapper<LongWritable, Text, Text, Text> {
 
 		private String product_id = "";
-		private Cassandra casObj = Cassandra.getInstance();
-		
+		private String prev_product_id = "";
+		private String product_name = "";
+		private String prev_product_name = "";
+		private String product_review_summary = "";
+		private String product_review_text = "";
+		private String temp_product_reviews="";
+		private boolean first = true;
+
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
-			
-			
 			String line = value.toString();
 			String []tokens = line.split(" ");
 			
 			for (int i = 0; i < tokens.length; i++) {
-				String empty = "";
 				if (tokens[i].equals("product/productId:")) {
 					product_id = tokens[i+1];
-					String query = "INSERT INTO pds_ks.id_to_name (product_id, product_name) "
-							+ "VALUES ('"+tokens[i+1]+"', '"+empty+"')";
-					System.out.println(query);
-					casObj.insertData(query);
+					if (first) {
+						prev_product_id = product_id;
+					}
 				}
 				else if (tokens[i].equals("product/title:")) {
+					product_name = ConvertArrayToString(tokens);
+					if (first) {
+						prev_product_name = product_name;
+						first = false;
+					}
+				}
+				else if (tokens[i].equals("review/summary:")) {
+					product_review_summary = ConvertArrayToString(tokens);
+				}
+				else if (tokens[i].equals("review/text:")) {
+					product_review_text = ConvertArrayToString(tokens);
+					if (!prev_product_name.equals(product_name) && prev_product_id != product_id) {
+						String temp_product_info = prev_product_id + " " + prev_product_name;
+						context.write(new Text(temp_product_info), new Text(temp_product_reviews));
+						prev_product_id = product_id;
+						prev_product_name = product_name;
+						product_id = "";
+						product_name = "";
+						product_review_summary = "";
+						product_review_text = "";
+						temp_product_reviews = "";
+					}
+					else {
+						temp_product_reviews += " "+ product_review_summary + " " + product_review_text;
+					}
 					
-					String product_name = StringEscapeUtils.escapeSql(ConvertArrayToString(tokens));
-					String updateQuery = "UPDATE pds_ks.id_to_name "
-							+ "SET product_name ='"+product_name+"' "
-									+ "WHERE product_id='"+product_id+"'";
-					
-					casObj.insertData(updateQuery);
-					product_id = "";
 				}
 			}
 		}
@@ -58,37 +81,22 @@ public class ProductIdToName {
 			}
 			return sb.toString();
 		}
+			
 	}
-
-//	public static class Reduce extends
-//			Reducer<Text, IntWritable, Text, IntWritable> {
-//
-//		public void reduce(Text key, Iterable<IntWritable> values,
-//				Context context) throws IOException, InterruptedException {
-//			int sum = 0;
-//			for (IntWritable val : values) {
-//				sum += val.get();
-//			}
-//			context.write(key, new IntWritable(sum));
-//		}
-//	}
-
+	
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
 
-		Job job = new Job(conf, "ReviewAnalysis");
-		job.setJarByClass(WordCount.class);
-
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(IntWritable.class);
+		Job job = new Job(conf, "ProductIdToNameMapping");
+		job.setJarByClass(ProductIdToName.class);
 
 		job.setMapperClass(Map.class);
-		//job.setReducerClass(Reduce.class);
-		job.setNumReduceTasks(0);
-
+		
 		job.setInputFormatClass(TextInputFormat.class);
-		job.setOutputKeyClass(NullOutputFormat.class);
-
+		job.setOutputFormatClass(TextOutputFormat.class);
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(Text.class);
+		
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
