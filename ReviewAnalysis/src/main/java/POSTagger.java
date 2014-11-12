@@ -2,8 +2,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+//import java.nio.file.Files;
+//import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -20,41 +20,40 @@ import opennlp.tools.util.InvalidFormatException;
 
 public class POSTagger
 {
-	public static void main(String args[])
+	
+	private static POSModel model = new POSModelLoader().load(new File(
+			"src//main//resources//en-pos-maxent.bin"));
+	
+	public static ArrayList<String> POSTaggedWords (String reviews) throws IOException
 	{
-		try
+//			String reviews = new String(Files.readAllBytes(Paths
+//					.get("src/main/resources/ReviewAggregate.txt")));
+//			System.out.println("Reviews : " + reviews);
+		ArrayList<String> tokenList = new ArrayList<String>();
+		tokenList = Tokenize(reviews);
+		ArrayList<String> tagList = POSTag(tokenList);
+		ArrayList<String> wordList = new ArrayList<String>();
+		for (int i = 0; i < tokenList.size(); i++)
 		{
-			String reviews = new String(Files.readAllBytes(Paths
-					.get("src//main//resources//ReviewAggregate.txt")));
-			System.out.println("Reviews : " + reviews);
-			ArrayList<String> tokenList = new ArrayList<String>();
-			tokenList = Tokenize(reviews);
-			ArrayList<String> tagList = POSTag(tokenList);
-			ArrayList<String> wordList = new ArrayList<String>();
-			for (int i = 0; i < tokenList.size(); i++)
+			// System.out.println(tokenList.get(i) + " " + tagList.get(i));
+			if (tagList.get(i).equalsIgnoreCase(Tags.ADJECTIVE)
+					|| tagList.get(i).equalsIgnoreCase(
+							Tags.ADJECTIVE_COMPARATIVE)
+					|| tagList.get(i).equalsIgnoreCase(
+							Tags.ADJECTIVE_SUPERLATIVE)
+					|| tagList.get(i).equalsIgnoreCase(Tags.ADVERB)
+					|| tagList.get(i).equalsIgnoreCase(
+							Tags.ADVERB_COMPARATIVE)
+					|| tagList.get(i).equalsIgnoreCase(
+							Tags.ADVERB_SUPERLATIVE))
 			{
-				// System.out.println(tokenList.get(i) + " " + tagList.get(i));
-				if (tagList.get(i).equalsIgnoreCase(Tags.ADJECTIVE)
-						|| tagList.get(i).equalsIgnoreCase(
-								Tags.ADJECTIVE_COMPARATIVE)
-						|| tagList.get(i).equalsIgnoreCase(
-								Tags.ADJECTIVE_SUPERLATIVE)
-						|| tagList.get(i).equalsIgnoreCase(Tags.ADVERB)
-						|| tagList.get(i).equalsIgnoreCase(
-								Tags.ADVERB_COMPARATIVE)
-						|| tagList.get(i).equalsIgnoreCase(
-								Tags.ADVERB_SUPERLATIVE))
-				{
-					System.out.println(tokenList.get(i)
-							+ " is an adverb or an adjective");
-					wordList.add(tokenList.get(i));
-				}
+//					System.out.println(tokenList.get(i)
+//							+ " is an adverb or an adjective");
+				wordList.add(tokenList.get(i));
 			}
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		
+		return wordList;
 	}
 
 	public static String[] SentenceDetect(String paragraph)
@@ -86,14 +85,14 @@ public class POSTagger
 	public static ArrayList<String> POSTag(ArrayList<String> tokenList)
 			throws IOException
 	{
-		POSModel model = new POSModelLoader().load(new File(
-				"src//main//resources//en-pos-maxent.bin"));
+		//POSModel model = new POSModelLoader().load(new File(
+			//	"src//main//resources//en-pos-maxent.bin"));
 		// PerformanceMonitor perfMon = new PerformanceMonitor(System.err,
 		// "sent");
 		POSTaggerME tagger = new POSTaggerME(model);
 		// perfMon.start();
 		// TODO Change crappier version
-		int cnt = 0;
+		
 		ArrayList<String> tagList = new ArrayList<String>();
 		for (String line : tokenList)
 		{

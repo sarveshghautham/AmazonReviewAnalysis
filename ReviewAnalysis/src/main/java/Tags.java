@@ -31,11 +31,11 @@ public class Tags
 	static final String VERB_PAST_TENSE="VBD";
 	static final String VERB_GERUND_OR_PRESENT_PARTICIPLE="VBG";
 	static final String VERB_PAST_PARTICIPLE="VBN";
-	static final String VERB_NON­3RD_PERSON_SINGULAR_PRESENT="VBP";
+	static final String VERB_NON3RD_PERSON_SINGULAR_PRESENT="VBP";
 	static final String VERB_3RD_PERSON_SINGULAR_PRESENT="VBZ";
-	static final String WH­DETERMINER="WDT";
-	static final String WH­PRONOUN="WP";
-	static final String POSSESSIVE_WH­PRONOUN="WP$";
+	static final String WHDETERMINER="WDT";
+	static final String WHPRONOUN="WP";
+	static final String POSSESSIVE_WHPRONOUN="WP$";
 	static final String WHADVERB="WRB";
 	private Tags()
 	{

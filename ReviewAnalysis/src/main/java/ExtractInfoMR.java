@@ -1,7 +1,4 @@
 import java.io.IOException;
-
-
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
@@ -13,7 +10,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 
-public class ProductIdToName {
+public class ExtractInfoMR {
 
 	public static class Map extends
 			Mapper<LongWritable, Text, Text, Text> {
@@ -31,41 +28,41 @@ public class ProductIdToName {
 				throws IOException, InterruptedException {
 
 			String line = value.toString();
-			String []tokens = line.split(" ");
+			String []tokens = line.split(":");
 			
 			for (int i = 0; i < tokens.length; i++) {
-				if (tokens[i].equals("product/productId:")) {
+				if (tokens[i].equals("product/productId")) {
 					product_id = tokens[i+1];
 					if (first) {
 						prev_product_id = product_id;
 					}
 				}
-				else if (tokens[i].equals("product/title:")) {
+				else if (tokens[i].equals("product/title")) {
 					product_name = ConvertArrayToString(tokens);
 					if (first) {
 						prev_product_name = product_name;
 						first = false;
 					}
 				}
-				else if (tokens[i].equals("review/summary:")) {
+				else if (tokens[i].equals("review/summary")) {
 					product_review_summary = ConvertArrayToString(tokens);
 				}
-				else if (tokens[i].equals("review/text:")) {
+				else if (tokens[i].equals("review/text")) {
 					product_review_text = ConvertArrayToString(tokens);
 					if (!prev_product_name.equals(product_name) && prev_product_id != product_id) {
-						String temp_product_info = prev_product_id + " " + prev_product_name;
+						String temp_product_info = prev_product_id + " " + prev_product_name + " ||";
 						context.write(new Text(temp_product_info), new Text(temp_product_reviews));
 						prev_product_id = product_id;
 						prev_product_name = product_name;
-						product_id = "";
-						product_name = "";
-						product_review_summary = "";
-						product_review_text = "";
+						//product_id = "";
+						//product_name = "";
+						//product_review_summary = "";
+						//product_review_text = "";
 						temp_product_reviews = "";
+						
 					}
-					else {
-						temp_product_reviews += " "+ product_review_summary + " " + product_review_text;
-					}
+					
+					temp_product_reviews += " "+ product_review_summary + " " + product_review_text;
 					
 				}
 			}
@@ -88,7 +85,7 @@ public class ProductIdToName {
 		Configuration conf = new Configuration();
 
 		Job job = new Job(conf, "ProductIdToNameMapping");
-		job.setJarByClass(ProductIdToName.class);
+		job.setJarByClass(ExtractInfoMR.class);
 
 		job.setMapperClass(Map.class);
 		
