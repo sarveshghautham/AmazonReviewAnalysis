@@ -76,7 +76,7 @@ public class POSTagMR {
 		Configuration conf = new Configuration();
 
 		Job job = new Job(conf, "POSTagMR");
-		job.setJarByClass(WordCount.class);
+		job.setJarByClass(POSTagMR.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
