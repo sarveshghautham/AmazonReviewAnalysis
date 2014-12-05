@@ -2,8 +2,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-//import java.nio.file.Files;
-//import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -11,8 +9,6 @@ import opennlp.tools.cmdline.postag.POSModelLoader;
 import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSSample;
 import opennlp.tools.postag.POSTaggerME;
-import opennlp.tools.sentdetect.SentenceDetectorME;
-import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
@@ -54,19 +50,6 @@ public class POSTagger
 		}
 		
 		return wordList;
-	}
-
-	public static String[] SentenceDetect(String paragraph)
-			throws InvalidFormatException, IOException
-	{
-		// always start with a model, a model is learned from training data
-		InputStream is = new FileInputStream(
-				"src//main//resources//en-sent.bin");
-		SentenceModel model = new SentenceModel(is);
-		SentenceDetectorME sdetector = new SentenceDetectorME(model);
-		String sentences[] = sdetector.sentDetect(paragraph);
-		is.close();
-		return sentences;
 	}
 
 	public static ArrayList<String> Tokenize(String sentence)
