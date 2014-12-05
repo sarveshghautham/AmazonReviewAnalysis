@@ -58,12 +58,9 @@ public class ExtractInfoMR {
 						//product_name = "";
 						//product_review_summary = "";
 						//product_review_text = "";
-						temp_product_reviews = "";
-						
+						temp_product_reviews = "";	
 					}
-					
-					temp_product_reviews += " "+ product_review_summary + " " + product_review_text;
-					
+					temp_product_reviews += " "+ product_review_summary + " " + product_review_text + " <end>";	
 				}
 			}
 		}
@@ -77,8 +74,7 @@ public class ExtractInfoMR {
 					sb.append(" ");
 			}
 			return sb.toString();
-		}
-			
+		}	
 	}
 	
 	public static void main(String[] args) throws Exception {
