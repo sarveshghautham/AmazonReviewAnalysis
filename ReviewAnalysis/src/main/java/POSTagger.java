@@ -32,16 +32,16 @@ public class POSTagger
 		for (int i = 0; i < tokenList.size(); i++)
 		{
 			// System.out.println(tokenList.get(i) + " " + tagList.get(i));
-			if (tagList.get(i).equalsIgnoreCase(Tags.ADJECTIVE)
+			if (tagList.get(i).equalsIgnoreCase(Constants.ADJECTIVE)
 					|| tagList.get(i).equalsIgnoreCase(
-							Tags.ADJECTIVE_COMPARATIVE)
+							Constants.ADJECTIVE_COMPARATIVE)
 					|| tagList.get(i).equalsIgnoreCase(
-							Tags.ADJECTIVE_SUPERLATIVE)
-					|| tagList.get(i).equalsIgnoreCase(Tags.ADVERB)
+							Constants.ADJECTIVE_SUPERLATIVE)
+					|| tagList.get(i).equalsIgnoreCase(Constants.ADVERB)
 					|| tagList.get(i).equalsIgnoreCase(
-							Tags.ADVERB_COMPARATIVE)
+							Constants.ADVERB_COMPARATIVE)
 					|| tagList.get(i).equalsIgnoreCase(
-							Tags.ADVERB_SUPERLATIVE))
+							Constants.ADVERB_SUPERLATIVE))
 			{
 //					System.out.println(tokenList.get(i)
 //							+ " is an adverb or an adjective");

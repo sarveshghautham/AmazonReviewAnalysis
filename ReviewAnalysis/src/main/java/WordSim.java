@@ -1,10 +1,7 @@
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
@@ -15,7 +12,6 @@ import edu.mit.jwi.item.POS;
 
 public class WordSim
 {
-	private String path = "src/main/resources/dict";
 	private URL url = null;
 	private static IDictionary dict = null;
 
@@ -23,7 +19,7 @@ public class WordSim
 	{
 		try
 		{
-			url = new URL("file", null, path);
+			url = new URL("file", null, Constants.DICTPATH);
 		}
 		catch (MalformedURLException e)
 		{
@@ -45,29 +41,59 @@ public class WordSim
 
 	}
 
-	public ArrayList<String> formList(Map<String, Integer> wordList)
+	public ArrayList<String> reduceList(ArrayList<Word> wordList)
 	{
-		// look up first sense of the word "dog"
 		ArrayList<String> finalList = new ArrayList<String>();
-		for (String word : wordList.keySet())
+		ArrayList<String> glList = new ArrayList<String>();
+		for (Word wordInst : wordList)
 		{
-			IIndexWord idxWord = dict.getIndexWord(word, POS.ADJECTIVE);
-			IWordID wordID = idxWord.getWordIDs().get(0);
-			IWord dictWord = dict.getWord(wordID);
-			List<IWordID> relatedWords = dictWord.getRelatedWords();
-			for (Object dWord : relatedWords)
+			String word = wordInst.getWord();
+			String posVal = posConverter(wordInst.getPartOfSpeech());
+			if(null == posVal)
+				continue;
+			IIndexWord idxWord = dict.getIndexWord(word, POS.valueOf(posVal));
+			if (null != idxWord)
 			{
-				String relWord = dWord.toString();
-				if(finalList.contains(relWord))
-					finalList.add(relWord);
-				else
-					finalList.add(word);
+				IWordID wordID = idxWord.getWordIDs().get(0);
+				IWord dictWord = dict.getWord(wordID);
+				ArrayList<String> tempList = new ArrayList<String>();
+				boolean found = false;
+				for (IWordID dWord : dictWord.getRelatedWords())
+				{
+					String relWord = dWord.getLemma();
+					if (finalList.contains(relWord))
+					{
+						found = true;
+						tempList.add(relWord);
+					}
+				}
+				if(!found)
+					tempList.add(word);
+				glList.addAll(tempList);
 			}
-			// System.out.println("Lemma = " + dictWord.getLemma());
-			// System.out.println("Gloss = " + dictWord.getSynset().getGloss());
+			else
+			{
+				System.out.println(word + " not found in Dictionary!");
+			}
 		}
-
+		finalList.addAll(glList);
 		return finalList;
 	}
+
+	private String posConverter(String pos)
+	{
+		if(pos.equalsIgnoreCase(Constants.ADJECTIVE))
+				return "adjective".toUpperCase();
+		if(pos.equalsIgnoreCase(Constants.ADVERB))
+			return "adverb".toUpperCase();
+		if(pos.equalsIgnoreCase(Constants.NOUN_PLURAL) || pos.equalsIgnoreCase(Constants.NOUN_SINGULAR_OR_MASS))
+			return "noun".toUpperCase();
+		if(pos.equalsIgnoreCase(Constants.VERB_BASE_FORM) || pos.equalsIgnoreCase(Constants.VERB_3RD_PERSON_SINGULAR_PRESENT)
+				|| pos.equalsIgnoreCase(Constants.VERB_GERUND_OR_PRESENT_PARTICIPLE) || pos.equalsIgnoreCase(Constants.VERB_NON3RD_PERSON_SINGULAR_PRESENT)
+				|| pos.equalsIgnoreCase(Constants.VERB_PAST_PARTICIPLE) || pos.equalsIgnoreCase(Constants.VERB_PAST_TENSE))
+			return "verb".toUpperCase();
+		return null;
+	}
+
 
 }

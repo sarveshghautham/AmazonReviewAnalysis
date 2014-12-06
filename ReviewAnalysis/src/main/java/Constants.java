@@ -1,5 +1,5 @@
 
-public class Tags
+public class Constants
 {
 	static final String COORDINATING_CONJUNCTION="CC";
 	static final String CARDINAL_NUMBER="CD";
@@ -37,7 +37,17 @@ public class Tags
 	static final String WHPRONOUN="WP";
 	static final String POSSESSIVE_WHPRONOUN="WP$";
 	static final String WHADVERB="WRB";
-	private Tags()
+	static final String REVIEWDELIM = "<end>";
+	static final String POSITIVE = "Positive";
+	static final String NEGATIVE = "Negative";
+	static final String NEUTRAL = "Neutral";
+	static final String VERY_POSITIVE = "Very positive";
+	static final String VERY_NEGATIVE = "Very negative";
+	static final String DICTPATH = "src/main/resources/dict";
+	static final String ADVCOMP = "acomp";
+	static final String ADVCL = "advcl";
+	static final String ADVMOD = "advmod";
+	private Constants()
 	{
 	}
 }
