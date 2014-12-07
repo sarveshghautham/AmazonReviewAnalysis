@@ -11,7 +11,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.PositionAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
@@ -28,8 +33,9 @@ public class NLPParser
 	static Annotation document = null;
 	WordSim ws = null;
 	Map<String, Boolean> stopWords = new HashMap<String, Boolean>();
-
-	public NLPParser()
+	private static NLPParser nlpObj = null;
+	
+	private NLPParser()
 	{
 		// creates a StanfordCoreNLP object, with POS tagging,
 		// lemmatization, NER, parsing, and coreference resolution
@@ -52,9 +58,18 @@ public class NLPParser
 		}
 
 	}
+	
+	public static NLPParser getInstance () {
+		if (nlpObj == null) {
+			nlpObj = new NLPParser();			
+		}	
+		
+		return nlpObj;
+	}
 
-	void parseText(String text)
+	public NlpResult parseText(String text)
 	{
+	
 		ArrayList<Word> wordList = new ArrayList<Word>();
 		Map<String, Integer> sentimentList = new HashMap<String, Integer>();
 		Class<SentencesAnnotation> sentenceAnnotation = SentencesAnnotation.class;
@@ -78,7 +93,7 @@ public class NLPParser
 		{
 			// Sentiment analysis
 			String sentiment = sentence.get(className);
-			//System.out.println("Sentence: " + sentence + " -- " + sentiment);
+			System.out.println("Sentence: " + sentence + " -- " + sentiment);
 			if (sentiment.equals(Constants.POSITIVE))
 				positive++;
 			if (sentiment.equals(Constants.NEGATIVE))
@@ -95,49 +110,49 @@ public class NLPParser
 				else
 					sentimentList.put(Constants.NEGATIVE,
 							sentimentList.get(Constants.NEGATIVE) + 1);
-				//System.out.println("Resetting count");
+				System.out.println("Resetting count");
 				positive = 0;
 				negative = 0;
 			}
 			// traversing the words in the current sentence
 			// a CoreLabel is a CoreMap with additional token-specific
 
-			/*for (CoreLabel token : sentence.get(tokensAnnotation))
+			for (CoreLabel token : sentence.get(TokensAnnotation.class))
 			{
 				// this is the text of the token
-				String lemma = token.get(lemmaAnnotation);
+				String lemma = token.get(LemmaAnnotation.class);
 				// this is the POS tag of the token
-				String pos = token.get(posAnnotation);
+				String pos = token.get(PartOfSpeechAnnotation.class);
 
 				// TODO Handler adverbial modifier, adjectival compliment,
 				// adjectival modifier in dependency tree
-				if (pos.equals(Constants.ADJECTIVE) && null != lemma)
+				if (pos.equals(Constants.ADJECTIVE) || pos.equals(Constants.ADVERB) && null != lemma)
 				{
 					if (!lemma.equalsIgnoreCase(Constants.REVIEWDELIM))
-						wordList.add(lemma);
-				}
-			}*/
-
-			SemanticGraph dependencies = sentence
-					.get(CollapsedCCProcessedDependenciesAnnotation.class);
-			Set<Word> wordSet = new HashSet<Word>();
-			for (TypedDependency dep : dependencies.typedDependencies())
-			{
-				String reln = dep.reln().toString();
-				String gov = dep.gov().lemma();
-				String p_gov = dep.gov().tag();
-				String depWord = dep.dep().lemma();
-				String p_depWord = dep.dep().tag();
-				if (reln.equals(Constants.ADVCL) || reln.equals(Constants.ADVCOMP)
-						|| reln.equals(Constants.ADVMOD))
-				{
-					if(!stopWords.containsKey(gov))
-						wordSet.add(new Word(gov, p_gov));
-					if(!stopWords.containsKey(depWord))
-						wordSet.add(new Word(depWord, p_depWord));
+						wordList.add(new Word(lemma, pos));
 				}
 			}
-			wordList.addAll(wordSet);
+
+//			SemanticGraph dependencies = sentence
+//					.get(CollapsedCCProcessedDependenciesAnnotation.class);
+//			Set<Word> wordSet = new HashSet<Word>();
+//			for (TypedDependency dep : dependencies.typedDependencies())
+//			{
+//				String reln = dep.reln().toString();
+//				String gov = dep.gov().lemma();
+//				String p_gov = dep.gov().tag();
+//				String depWord = dep.dep().lemma();
+//				String p_depWord = dep.dep().tag();
+//				if (reln.equals(Constants.ADVCL) || reln.equals(Constants.ADVCOMP)
+//						|| reln.equals(Constants.ADVMOD))
+//				{
+//					if(!stopWords.containsKey(gov))
+//						wordSet.add(new Word(gov, p_gov));
+//					if(!stopWords.containsKey(depWord))
+//						wordSet.add(new Word(depWord, p_depWord));
+//				}
+//			}
+//			wordList.addAll(wordSet);
 		}
 
 		//System.out.println("***");
@@ -163,6 +178,7 @@ public class NLPParser
 		double posPercentage = ((double) pos / (pos + neg)) * 100;
 		System.out.println("Positive %: " + posPercentage);
 
+		return new NlpResult(ws.reduceList(wordList), posPercentage);
 	}
 
 	public static void main(String[] args)

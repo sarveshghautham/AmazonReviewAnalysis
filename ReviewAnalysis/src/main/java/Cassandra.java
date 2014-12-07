@@ -28,8 +28,8 @@ public class Cassandra {
 	}
 	
 	public void connect(String node) {
-	   cluster = Cluster.builder()
-	         .addContactPoint(node).withPort(9042).
+	   cluster = Cluster.builder().withPort(9042)
+	         .addContactPoint(node).
 	         build();
 	   
 	   
@@ -44,7 +44,6 @@ public class Cassandra {
 	
 	public void insertData (String query) {
 		Session session = cluster.connect();
-		System.out.println(query);
 		session.execute(query);      
 	}
 	
@@ -66,10 +65,10 @@ public class Cassandra {
 		cluster.close();
 	}
 	
-//	public static void main (String []args) {
-//		Cassandra casObj = new Cassandra();
-//		
-//		String query_try = "INSERT INTO pds_ks.id_to_name (product_id, product_name) VALUES ('B000FTPOMK', '14k Yellow Gold Butterfly Pendant, 16')";
+	public static void main (String []args) {
+		Cassandra casObj = Cassandra.getInstance();
+		
+		String query_try = "INSERT INTO pds_ks.reviews (product_id, product_name, positive_percentage, top_k_words) VALUES ('B000FTPOMK', '14k Yellow Gold Butterfly Pendant, 16',69.00,'good:5, bad:3')";
 //		String query_try = "UPDATE pds_ks.id_to_name SET product_name='14k' WHERE product_id='B000FTPOMK'";
 //		String updateQuery = "UPDATE pds_ks.id_to_name "
 //				+ "SET product_name ='"+product_name+"' "
@@ -82,9 +81,9 @@ public class Cassandra {
 //		String updateQuery = "UPDATE pds_ks.id_to_name "
 //		+ "SET product_name ='"+product_name+"' "
 //				+ "WHERE product_id='"+product_id+"'";
-//
-//		casObj.insertData(query_try);
+
+		casObj.insertData(query_try);
 		
-//	}
+	}
 	
 }
