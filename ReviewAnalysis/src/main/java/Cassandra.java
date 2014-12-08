@@ -31,6 +31,7 @@ public class Cassandra
 	{
 		if (dbObj == null)
 			dbObj = new Cassandra();
+		loadProperties();
 		ipAddr = prop.getProperty("address");
 		port = Integer.parseInt(prop.getProperty("port"));
 		keySpace = prop.getProperty("keyspace");
@@ -154,20 +155,8 @@ public class Cassandra
 		Cassandra casObj = Cassandra.getInstance();
 		
 		String query_try = "INSERT INTO pds_ks.reviews (product_id, product_name, positive_percentage, top_k_words) VALUES ('B000FTPOMK', '14k Yellow Gold Butterfly Pendant, 16',69.00,'good:5, bad:3')";
-//		String query_try = "UPDATE pds_ks.id_to_name SET product_name='14k' WHERE product_id='B000FTPOMK'";
-//		String updateQuery = "UPDATE pds_ks.id_to_name "
-//				+ "SET product_name ='"+product_name+"' "
-//						+ "WHERE product_id='"+product_id+"'";
-//		casObj.insertData(updateQuery);
-//		
-//		String product_id = "B000FTPOMK";
-//		String product_name = "'14k Yellow Gold Butterfly Pendant, 16";
-//		
-//		String updateQuery = "UPDATE pds_ks.id_to_name "
-//		+ "SET product_name ='"+product_name+"' "
-//				+ "WHERE product_id='"+product_id+"'";
-
 		casObj.insertData(query_try);
+		casObj.close();
 		
 	}
 	
