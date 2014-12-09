@@ -1,5 +1,3 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,7 +35,7 @@ public class NLPParser
 				"tokenize, ssplit, pos, lemma, parse, sentiment");
 		pipeline = new StanfordCoreNLP(props);
 		ws = new WordSim();
-		try
+		/*try
 		{
 			BufferedReader br = new BufferedReader(new FileReader("src/main/resources/Stopwords.txt"));
 			String line = null;
@@ -48,7 +46,7 @@ public class NLPParser
 		catch (Exception e)
 		{
 			e.printStackTrace();
-		}
+		}*/
 
 	}
 	
