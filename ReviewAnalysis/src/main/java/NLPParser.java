@@ -5,24 +5,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-
 import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.PositionAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations.ClassName;
-import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.util.CoreMap;
 
 public class NLPParser
@@ -41,7 +34,7 @@ public class NLPParser
 		// lemmatization, NER, parsing, and coreference resolution
 		props = new Properties();
 		props.put("annotators",
-				"tokenize, ssplit, pos, lemma, ner, parse, dcoref, sentiment");
+				"tokenize, ssplit, pos, lemma, parse, sentiment");
 		pipeline = new StanfordCoreNLP(props);
 		ws = new WordSim();
 		try
@@ -72,7 +65,6 @@ public class NLPParser
 	
 		ArrayList<Word> wordList = new ArrayList<Word>();
 		Map<String, Integer> sentimentList = new HashMap<String, Integer>();
-		Class<SentencesAnnotation> sentenceAnnotation = SentencesAnnotation.class;
 		Class<ClassName> className = ClassName.class;
 		sentimentList.put(Constants.POSITIVE, 0);
 		sentimentList.put(Constants.NEGATIVE, 0);
@@ -81,11 +73,7 @@ public class NLPParser
 		document = new Annotation(text);
 		pipeline.annotate(document);
 
-		// these are all the sentences in this document
-		// a CoreMap is essentially a Map that uses class objects as keys
-		// and has values with custom types
-		List<CoreMap> sentences = document.get(sentenceAnnotation);
-
+		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 		int positive = 0, negative = 0;
 
 		// For each sentence, do this
@@ -124,9 +112,7 @@ public class NLPParser
 				// this is the POS tag of the token
 				String pos = token.get(PartOfSpeechAnnotation.class);
 
-				// TODO Handler adverbial modifier, adjectival compliment,
-				// adjectival modifier in dependency tree
-				if (pos.equals(Constants.ADJECTIVE) || pos.equals(Constants.ADVERB) && null != lemma)
+				if (pos.equals(Constants.ADJECTIVE) && null != lemma)
 				{
 					if (!lemma.equalsIgnoreCase(Constants.REVIEWDELIM))
 						wordList.add(new Word(lemma, pos));
@@ -154,19 +140,6 @@ public class NLPParser
 //			}
 //			wordList.addAll(wordSet);
 		}
-
-		//System.out.println("***");
-
-		// This is the coreference link graph
-		// Each chain stores a set of mentions that link to each other,
-		// along with a method for getting the most representative mention
-		// Both sentence and token offsets start at 1!
-		/*
-		 * Map<Integer, CorefChain> graph = document
-		 * .get(CorefChainAnnotation.class); for (Entry<Integer, CorefChain>
-		 * entry : graph.entrySet()) System.out.println(entry.getKey() + " " +
-		 * entry.getValue());
-		 */
 
 		System.out.println("Final list");
 		// Reduce the list
