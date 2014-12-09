@@ -126,7 +126,7 @@ public class NLPParser
 
 				// TODO Handler adverbial modifier, adjectival compliment,
 				// adjectival modifier in dependency tree
-				if (pos.equals(Constants.ADJECTIVE) || pos.equals(Constants.ADVERB) && null != lemma)
+				if (pos.equals(Constants.ADJECTIVE) && null != lemma)
 				{
 					if (!lemma.equalsIgnoreCase(Constants.REVIEWDELIM))
 						wordList.add(new Word(lemma, pos));
